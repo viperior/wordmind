@@ -1,0 +1,2 @@
+# wordmind
+Anagram solver
