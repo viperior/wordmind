@@ -1,13 +1,19 @@
 class WMDictionary
   attr_reader :words
 
-  def initialize(letters)
+  def initialize()
+    @definitions = Hash.new
     @letters = Array.new()
+    @original_letter_count = nil
     @words = Array.new()
+  end
 
-    letters.each_char do |char|
-      @letters << char
-    end
+  def add_letters(letters)
+    letters = letters.gsub(/[^0-9a-z]/i, '').upcase
+    @original_letter_count = letters.length
+    letters = letters.split('')
+    letters = letters.uniq
+    @letters = letters
   end
 
   def display_members
@@ -16,16 +22,25 @@ class WMDictionary
     end
   end
 
+  def get_definition(word_text)
+    return @definitions[word_text]
+  end
+
   def load_dictionary
     # Load dictionary
     puts "Loading dictionary..."
 
     CSV.foreach(File.expand_path("..", Dir.pwd) + "/wordmind/data/dictionary.csv") do |row|
-      new_word = row[0].gsub(/[^0-9a-z]/i, '')
-      first_letter = new_word[0]
+      current_word = row[0].gsub(/[^0-9a-z]/i, '').upcase
+      definition = row[2]
 
-      if ((@letters.uniq.include? first_letter) && (new_word.size <= @letters.size))
-        @words << row[0].gsub(/[^0-9a-z]/i, '')
+      if (current_word.length > 1)
+        first_letter = current_word[0]
+      end
+
+      if ((@letters.uniq.include? first_letter) && (current_word.length <= @original_letter_count) && (!words.include? current_word))
+        @words << current_word
+        @definitions[current_word] = definition
       end
     end
 

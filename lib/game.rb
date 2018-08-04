@@ -3,50 +3,66 @@ class Game
 
   def initialize(letter_string, dictionary)
     @dictionary = dictionary
-    @possible_words = Array.new()
+    @permutations = get_permutations(letter_string)
+    @possible_words = nil
+  end
 
-    @permutations = letter_string.all_possible_permutations.uniq
-    more_permutations = Array.new()
+  def convert_character_array_to_string(character_array)
+    output = ""
 
-    @permutations.each do |permutation|
-      new_string = ""
+    character_array.each do |character|
+      output = output + character
+    end
 
-      permutation.each_char do |char|
-        new_string = new_string + char unless char == permutation[0]
+    return output
+  end
+
+  def get_permutations(text)
+    text_array = text.split('')
+    permutations = Array.new()
+
+    i = text_array.size
+
+    loop do
+      new_set = text_array.permutation(i)
+      new_set = new_set.uniq
+
+      new_set.each do |item|
+        item = convert_character_array_to_string(item)
+        permutations.push(item) unless item.length < 2
       end
 
-      more_permutations << new_string
+      break unless i > -1
+
+      i = i - 1
     end
 
-    more_permutations.uniq.each do |new_permutation|
-      @permutations << new_permutation
-    end
+    permutations = permutations.uniq
 
-    @permutations = @permutations.uniq
+    return permutations
   end
 
   def show_possible_words
-    puts "Letter permutations: #{@permutations.size}"
-    puts "Dictionary words: #{@dictionary.words.size}"
-    puts "Total permutations: #{@permutations.size * @dictionary.words.size}"
+    new_possible_words = Array.new()
+    performed_scan_operations = 0
+    total_scan_operations = @permutations.size * @dictionary.words.size
+    progress = 0
+    progress_milestone_interval = 10
 
-    puts "Proceed? y/n"
+    @permutations.each do |permutation|
+      new_valid_word = permutation
 
-    input = gets.chomp
-
-    if (input == "y")
-      @permutations.each do |permutation|
-        @dictionary.words.each do |dictionary_word|
-          @possible_words << permutation unless !(dictionary_word.to_s.include? permutation)
-          puts permutation unless !(dictionary_word.to_s.include? permutation)
-        end
+      if (@dictionary.words.include? new_valid_word)
+        new_possible_words.push(new_valid_word) unless new_valid_word.eql? ""
       end
 
-      @possible_words.each do |possible_word|
-        puts possible_word
-      end
-    else
-      puts "Operation aborted."
+      performed_scan_operations = performed_scan_operations + 1
+    end
+
+    @possible_words = new_possible_words
+
+    @possible_words.each do |possible_word|
+      puts "#{possible_word} - #{@dictionary.get_definition(possible_word)}"
     end
   end
 end

@@ -43,3 +43,10 @@ def display_header(width)
   display_border(width)
   display_dot_cloud(width, 5, 0.2)
 end
+
+def display_header_animation(frames, rate, width)
+  frames.times do
+    display_header(width)
+    sleep rate
+  end
+end

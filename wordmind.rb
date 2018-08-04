@@ -2,28 +2,30 @@ require 'CSV'
 
 Dir["./lib/*.rb"].each {|file| require file}
 
-
-
-display_header(88)
-
-input = 1
+display_header_animation(8, 0.1, 88)
+dictionary = WMDictionary.new()
+first_run = true
 
 loop do
-  puts "1) New game"
-  puts "2) Exit"
+  if (first_run)
+    input = 1
+    first_run = false
+  else
+    puts "1) New game"
+    puts "2) Exit"
 
-  input = gets.chomp.to_i
+    input = gets.chomp.to_i
+  end
 
   case input
   when 1
     puts "Letters:"
-    letters = gets.chomp
+    letters = gets.chomp.upcase
 
-    # Load dictionary
-    dictionary = WMDictionary.new(letters)
+    dictionary.add_letters(letters)
+    dictionary.load_dictionary
 
     new_game = Game.new(letters, dictionary)
-    puts "Permutating..." + new_game.permutations.size.to_s
 
     new_game.show_possible_words
   when 2
